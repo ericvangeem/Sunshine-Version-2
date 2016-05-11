@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class ForecastFragment extends Fragment {
     private static final String TAG = ForecastFragment.class.getSimpleName();
@@ -44,6 +45,21 @@ public class ForecastFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    private void updateWeather() {
+        final String preferredZip = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(
+                getResources().getString(R.string.pref_location_key), getResources().getString(R.string.pref_location_default));
+
+        Log.d(TAG, "Executing FetchWeatherTask with preferred zip " + preferredZip);
+
+        new FetchWeatherTask().execute(preferredZip);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -53,14 +69,8 @@ public class ForecastFragment extends Fragment {
         mForecastAdapter = new ArrayAdapter<>(
                 getActivity(),
                 R.layout.list_item_forecast,
-                R.id.list_item_forecast_textview);
-
-        final String preferredZip = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(
-                getResources().getString(R.string.pref_location_key), getResources().getString(R.string.pref_location_default));
-
-        Log.d(TAG, "Executing FetchWeatherTask with preferred zip " + preferredZip);
-
-        new FetchWeatherTask().execute(preferredZip);
+                R.id.list_item_forecast_textview,
+                new ArrayList<String>());
 
         listView.setAdapter(mForecastAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -90,12 +100,7 @@ public class ForecastFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int itemId = item.getItemId();
         if (itemId == R.id.action_refresh) {
-            final String preferredZip = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(
-                    getString(R.string.pref_location_key), getString(R.string.pref_location_default));
-
-            Log.d(TAG, "Executing FetchWeatherTask with preferred zip " + preferredZip);
-
-            new FetchWeatherTask().execute(preferredZip);
+            updateWeather();
             return true;
         }
 
