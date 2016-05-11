@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -54,7 +55,12 @@ public class ForecastFragment extends Fragment {
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview);
 
-        new FetchWeatherTask().execute("60606");
+        final String preferredZip = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(
+                getResources().getString(R.string.pref_location_key), getResources().getString(R.string.pref_location_default));
+
+        Log.d(TAG, "Executing FetchWeatherTask with preferred zip " + preferredZip);
+
+        new FetchWeatherTask().execute(preferredZip);
 
         listView.setAdapter(mForecastAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -84,7 +90,12 @@ public class ForecastFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int itemId = item.getItemId();
         if (itemId == R.id.action_refresh) {
-            new FetchWeatherTask().execute("60606");
+            final String preferredZip = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(
+                    getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+
+            Log.d(TAG, "Executing FetchWeatherTask with preferred zip " + preferredZip);
+
+            new FetchWeatherTask().execute(preferredZip);
             return true;
         }
 
