@@ -49,9 +49,12 @@ public class ForecastFragment extends Fragment {
         final String preferredZip = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(
                 getResources().getString(R.string.pref_location_key), getResources().getString(R.string.pref_location_default));
 
-        Log.d(TAG, "Executing FetchWeatherTask with preferred zip " + preferredZip);
+        final String preferredUnits = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(
+                getResources().getString(R.string.pref_units_key), getResources().getString(R.string.pref_units_default));
 
-        new FetchWeatherTask().execute(preferredZip);
+        Log.d(TAG, String.format("Executing FetchWeatherTask with preferred zip [%s] and preferred units [%s]", preferredZip, preferredUnits));
+
+        new FetchWeatherTask().execute(preferredZip, preferredUnits);
     }
 
     @Override
@@ -223,9 +226,9 @@ public class ForecastFragment extends Fragment {
             // Will contain the raw JSON response as a string.
             String forecastJsonStr = null;
             String zip = params[0];
+            String units = params[1];
 
             String format = "json";
-            String units = "metric";
             int numOfDays = 7;
 
             try {
