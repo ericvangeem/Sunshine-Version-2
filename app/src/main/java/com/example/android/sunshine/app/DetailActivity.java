@@ -19,9 +19,12 @@ package com.example.android.sunshine.app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,7 +79,27 @@ public class DetailActivity extends ActionBarActivity {
      */
     public static class DetailFragment extends Fragment {
 
+        private static final String FORECAST_HASHTAG = " #SunshineApp";
+
+        private ShareActionProvider mShareActionProvider;
+        private String mForecastString;
+
         public DetailFragment() {
+            setHasOptionsMenu(true);
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            super.onCreateOptionsMenu(menu, inflater);
+
+            inflater.inflate(R.menu.detailfragment, menu);
+
+            MenuItem item = menu.findItem(R.id.menu_item_share);
+
+            mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+
+            // Create and set a new share intent.
+            setShareIntent(createShareIntent());
         }
 
         @Override
@@ -87,12 +110,29 @@ public class DetailActivity extends ActionBarActivity {
             // The detail Activity called via intent.  Inspect the intent for forecast data.
             final Intent intent = getActivity().getIntent();
             if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-                final String weatherItem = intent.getStringExtra(Intent.EXTRA_TEXT);
+                mForecastString = intent.getStringExtra(Intent.EXTRA_TEXT);
+
                 ((TextView) rootView.findViewById(R.id.detail_text))
-                        .setText(weatherItem);
+                        .setText(mForecastString);
             }
 
             return rootView;
+        }
+
+        private Intent createShareIntent() {
+            final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, mForecastString + FORECAST_HASHTAG);
+
+            return shareIntent;
+        }
+
+        // Call to update the share intent
+        private void setShareIntent(final Intent shareIntent) {
+            if (mShareActionProvider != null) {
+                mShareActionProvider.setShareIntent(shareIntent);
+            }
         }
     }
 }

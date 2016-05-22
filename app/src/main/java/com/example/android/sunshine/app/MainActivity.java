@@ -43,6 +43,7 @@ public class MainActivity extends ActionBarActivity {
                 return true;
             case R.id.action_view_map:
                 openPreferredLocationInMap();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
